@@ -55,11 +55,11 @@ class Activity:
         return f"{emoji} {self.name}" if emoji else self.name
 
 
-def generate_ics(activities: list[Activity], output_file: str) -> None:
+def generate_ics(activities: list[Activity], output_file: str, emojis: bool) -> None:
     calendar = Calendar()
     for activity in activities:
         event = Event()
-        event.add("summary", activity.emojified_name())
+        event.add("summary", activity.emojified_name() if emojis else activity.name)
         event.add("dtstart", activity.start_time)
         event.add("dtend", activity.stop_time)
         event.add("X-DT-DATEUTIL", activity.timezone)
@@ -77,7 +77,7 @@ def main(args: argparse.Namespace) -> None:
     )
 
     activities = parse_csv_activities(args.activities_csv_file, last_activity)
-    generate_ics(activities, args.output_ics_file)
+    generate_ics(activities, args.output_ics_file, args.emojis)
     logging.info("ICS file generated at %s", args.output_ics_file)
 
 
@@ -87,6 +87,13 @@ def parse_args() -> argparse.Namespace:
             "Parse CSV data exported by the Withings Health Mate app and generate an "
             "ICS file."
         )
+    )
+
+    parser.add_argument(
+        "-e",
+        "--emojis",
+        action="store_true",
+        help="Prepend emojis to calendar event names."
     )
     parser.add_argument(
         "-i",
