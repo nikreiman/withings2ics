@@ -1,0 +1,6 @@
+icalendar
+mypy
+pytz
+ruff
+types-icalendar
+types-pytz
